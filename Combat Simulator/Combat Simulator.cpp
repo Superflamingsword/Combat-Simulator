@@ -1,11 +1,31 @@
-// Combat Simulator.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
-
 #include <iostream>
 
-int main()
-{
-    std::cout << "Hello World!\n";
+int main(){
+
+    const float delta_time = 0.1f;
+    float clock = 0.0f;
+    bool gameLoop = true;
+
+    //Mcree stats
+    const float mcreeHealth = 200.0f;
+    const float mcreeCloseDmg = 255.0f;
+    const float mcreeRangedDmg = 20.0f;
+    const int mcreeMagazine = 4;
+    const float mcreereloadSpeed = 1.5f;
+
+    //Roadhog stats
+    const float roadhogHealth = 200.0f;
+    const float roadhogCloseDmg = 255.0f;
+    const float roadhogRangedDmg = 20.0f;
+    const int roadhogMagazine = 4;
+    const float roadhogreloadSpeed = 1.5f;
+
+    while (gameLoop){
+
+        
+            gameLoop = false;
+
+    return 0;
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
