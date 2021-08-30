@@ -1,33 +1,92 @@
 #include <iostream>
+//functions for Mcree's damage and shooting rate at various distances
+int closeCombatMcree(float health);
+int rangedCombatMcree(float health);
 
-int main(){
+
+//functions for Roadhogs's damage and shooting rate at various dintances
+int closeCombatRoadhog(float health);
+int rangedCombatRoadhog(float health);
+
+int main() {
 
     const float delta_time = 0.1f;
     float clock = 0.0f;
     bool gameLoop = true;
+    bool getOverHere = false;
 
     //Mcree stats
-    const float mcreeHealth = 200.0f;
-    const float mcreeCloseDmg = 255.0f;
-    const float mcreeRangedDmg = 20.0f;
+    float mcreeHealth = 200.0f;
+
     const int mcreeMagazine = 4;
     const float mcreereloadSpeed = 1.5f;
 
     //Roadhog stats
-    const float roadhogHealth = 200.0f;
-    const float roadhogCloseDmg = 255.0f;
-    const float roadhogRangedDmg = 20.0f;
+    float roadhogHealth = 600.0f;
     const int roadhogMagazine = 4;
     const float roadhogreloadSpeed = 1.5f;
 
-    while (gameLoop){
+    while (gameLoop) {
 
-        
-            gameLoop = false;
+        std::cout << "Mcrees health is at: " << mcreeHealth << std::endl;
+        std::cout << "Roadhogs health is at: " << roadhogHealth << std::endl;
 
-    return 0;
+        if (getOverHere == true) {
+            float tempDmgRoadhog = roadhogHealth;
+            roadhogHealth = closeCombatMcree(roadhogHealth);
+            std::cout << "Mcree did: " << tempDmgRoadhog - roadhogHealth << " damage to Roadhog!\n";
+
+            float tempDmgMcree = mcreeHealth;
+            mcreeHealth = closeCombatRoadhog(mcreeHealth);
+            std::cout << "Roadhog did: " << tempDmgMcree - mcreeHealth << " damage to Mcree!\n";
+        }
+        else if (getOverHere == false) {
+            float tempDmgRoadhog = roadhogHealth;
+            roadhogHealth = rangedCombatMcree(roadhogHealth);
+            std::cout << "Mcree did: " << tempDmgRoadhog - roadhogHealth << " damage to Roadhog!\n";
+
+            float tempDmgMcree = mcreeHealth;
+            mcreeHealth = rangedCombatRoadhog(mcreeHealth);
+            std::cout << "Roadhog did: " << tempDmgMcree - mcreeHealth << " damage to Mcree!\n";
+        }
+
+        if (roadhogHealth < 0 || mcreeHealth < 0) {
+            if (roadhogHealth <= 0) {
+                std::cout << "Mcree wins!\n" << "Mcree had:" << mcreeHealth << " health left!\n";
+                gameLoop = false;
+            }
+            else if (mcreeHealth <= 0) {
+                std::cout << "Roadhog wins!\n" << "Roadhog had:" << roadhogHealth << " health left!\n";
+                gameLoop = false;
+            }
+            return 0;
+        }
+        std::cout<<std::endl;
+    }
+}
+int closeCombatMcree(float health){
+    const float mcreeCloseDmg = 70.0f;
+    health -= mcreeCloseDmg;
+    return health;
 }
 
+int rangedCombatMcree(float health){
+    const float mcreeRangedDmg = 35.0f;
+    health -= mcreeRangedDmg;
+    return health;
+}
+
+int closeCombatRoadhog(float health) {
+    const float roadhogCloseDmg = 255.0f;
+    health -= roadhogCloseDmg;
+    return health;
+}
+
+int rangedCombatRoadhog(float health) {
+    const float roadhogRangedDmg = 20.0f;
+    health -= roadhogRangedDmg;
+    return health;
+}
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
 // Debug program: F5 or Debug > Start Debugging menu
 
