@@ -10,6 +10,7 @@ int rangedCombatRoadhog(float health);
 
 int main() {
 
+    //variables that control the games loop and timekeeping
     const float delta_time = 0.1f;
     float clock = 0.0f;
     bool gameLoop = true;
@@ -17,7 +18,6 @@ int main() {
 
     //Mcree stats
     float mcreeHealth = 200.0f;
-
     const int mcreeMagazine = 4;
     const float mcreereloadSpeed = 1.5f;
 
@@ -27,30 +27,34 @@ int main() {
     const float roadhogreloadSpeed = 1.5f;
 
     while (gameLoop) {
-
+        clock += delta_time;
         std::cout << "Mcrees health is at: " << mcreeHealth << std::endl;
         std::cout << "Roadhogs health is at: " << roadhogHealth << std::endl;
+        std::cout << clock << " seconds have elappsed.\n";
+        //if(/*magazine*/) {
+            if (getOverHere == true) { //TODO fixa en räknare med delta_time och clock som medf hjälp av if-satser kollar när de får skjuta och inte. Kollar även magasin och reloading här
+                //TODO, sätt upp separata if-satser för Mcree och Roadhog så att de kan attackera oberoende av varandra. TODO sätt upp så att Roadhog kan hooka direkt och skriv ut det i konsollen. TODO, sätt in wait-funktioner så att det spelar ut i realtid.
+                //TODO, bryt ut allt detta i en egen fil eller funktion så att väldigt lite ligger i int Main.
+                //TODO, överkurs men sätt upp construktor så att det skulle vara lätt att göra nya karaktärer med sina egna stats och eventuellt abilities.
+                float tempDmgRoadhog = roadhogHealth;
+                roadhogHealth = closeCombatMcree(roadhogHealth);
+                std::cout << "Mcree did: " << tempDmgRoadhog - roadhogHealth << " damage to Roadhog!\n";
 
-        if (getOverHere == true) {
-            float tempDmgRoadhog = roadhogHealth;
-            roadhogHealth = closeCombatMcree(roadhogHealth);
-            std::cout << "Mcree did: " << tempDmgRoadhog - roadhogHealth << " damage to Roadhog!\n";
+                float tempDmgMcree = mcreeHealth;
+                mcreeHealth = closeCombatRoadhog(mcreeHealth);
+                std::cout << "Roadhog did: " << tempDmgMcree - mcreeHealth << " damage to Mcree!\n";
+            }
+            else if (getOverHere == false) {
+                float tempDmgRoadhog = roadhogHealth;
+                roadhogHealth = rangedCombatMcree(roadhogHealth);
+                std::cout << "Mcree did: " << tempDmgRoadhog - roadhogHealth << " damage to Roadhog!\n";
 
-            float tempDmgMcree = mcreeHealth;
-            mcreeHealth = closeCombatRoadhog(mcreeHealth);
-            std::cout << "Roadhog did: " << tempDmgMcree - mcreeHealth << " damage to Mcree!\n";
-        }
-        else if (getOverHere == false) {
-            float tempDmgRoadhog = roadhogHealth;
-            roadhogHealth = rangedCombatMcree(roadhogHealth);
-            std::cout << "Mcree did: " << tempDmgRoadhog - roadhogHealth << " damage to Roadhog!\n";
-
-            float tempDmgMcree = mcreeHealth;
-            mcreeHealth = rangedCombatRoadhog(mcreeHealth);
-            std::cout << "Roadhog did: " << tempDmgMcree - mcreeHealth << " damage to Mcree!\n";
-        }
-
-        if (roadhogHealth < 0 || mcreeHealth < 0) {
+                float tempDmgMcree = mcreeHealth;
+                mcreeHealth = rangedCombatRoadhog(mcreeHealth);
+                std::cout << "Roadhog did: " << tempDmgMcree - mcreeHealth << " damage to Mcree!\n";
+            }
+       // }
+        if (roadhogHealth <= 0 || mcreeHealth <= 0) {//Checks if any participant has lost all their health and subsequently lost the duel.
             if (roadhogHealth <= 0) {
                 std::cout << "Mcree wins!\n" << "Mcree had:" << mcreeHealth << " health left!\n";
                 gameLoop = false;
@@ -64,7 +68,7 @@ int main() {
         std::cout<<std::endl;
     }
 }
-int closeCombatMcree(float health){
+int closeCombatMcree(float health){//Separate functions for each character for if they're close to eacher or not. Deals the damage to the enemies health then returns that value to the Main function
     const float mcreeCloseDmg = 70.0f;
     health -= mcreeCloseDmg;
     return health;
