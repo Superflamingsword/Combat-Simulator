@@ -15,6 +15,7 @@ int main() {
     float clock = 0.0f;
     bool gameLoop = true;
     bool getOverHere = false;
+    int loopCount = 0;
 
     //Mcree stats
     float mcreeHealth = 200.0f;
@@ -28,14 +29,16 @@ int main() {
 
     while (gameLoop) {
         clock += delta_time;
+        loopCount += 1;
         std::cout << "Mcrees health is at: " << mcreeHealth << std::endl;
         std::cout << "Roadhogs health is at: " << roadhogHealth << std::endl;
         std::cout << clock << " seconds have elappsed.\n";
-        //if(/*magazine*/) {
+        if(clock == 0.5f) {//TODO, kolla upp hur man kan jämföra numret för att kolla om det är jämnt eller ojämnt. Väldigt konstigt iochmed att det är en float. Just nu körs den här endast 1 gång. Funderade på att resetta loopcount och ha den som jämförelse för clock men det skulle inte fungera.
             if (getOverHere == true) { //TODO fixa en räknare med delta_time och clock som medf hjälp av if-satser kollar när de får skjuta och inte. Kollar även magasin och reloading här
                 //TODO, sätt upp separata if-satser för Mcree och Roadhog så att de kan attackera oberoende av varandra. TODO sätt upp så att Roadhog kan hooka direkt och skriv ut det i konsollen. TODO, sätt in wait-funktioner så att det spelar ut i realtid.
                 //TODO, bryt ut allt detta i en egen fil eller funktion så att väldigt lite ligger i int Main.
                 //TODO, överkurs men sätt upp construktor så att det skulle vara lätt att göra nya karaktärer med sina egna stats och eventuellt abilities.
+                //TODO, gör som Numberphile sa, istället för float för floatpoint comparison så kör man int och bara multiplicerar eller dividerar för att få det att bli som en float. Då vet jag att % 2 == 0 kommer att fungera. Om varje loop blir 1 sekund och då skjuter Mcree varje loop och Roadhog skjuter varannan loop. Det skulle funka men vet inte om det skulle vara det bösta,
                 float tempDmgRoadhog = roadhogHealth;
                 roadhogHealth = closeCombatMcree(roadhogHealth);
                 std::cout << "Mcree did: " << tempDmgRoadhog - roadhogHealth << " damage to Roadhog!\n";
@@ -53,7 +56,7 @@ int main() {
                 mcreeHealth = rangedCombatRoadhog(mcreeHealth);
                 std::cout << "Roadhog did: " << tempDmgMcree - mcreeHealth << " damage to Mcree!\n";
             }
-       // }
+        }
         if (roadhogHealth <= 0 || mcreeHealth <= 0) {//Checks if any participant has lost all their health and subsequently lost the duel.
             if (roadhogHealth <= 0) {
                 std::cout << "Mcree wins!\n" << "Mcree had:" << mcreeHealth << " health left!\n";
