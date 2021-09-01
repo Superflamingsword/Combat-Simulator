@@ -1,103 +1,124 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
-//functions for Mcree's damage and shooting rate at various distances
-int closeCombatMcree(int health);
-int rangedCombatMcree(int health);
+int combatMcree(int roadhogHealth, bool hooked);
+int combatRoadHog(int roadhogHealth, bool hooked);
+int gameOver(int roadhogHealth, int mcreeHealth, bool gameLoop);
 
-
-//functions for Roadhogs's damage and shooting rate at various dintances
-int closeCombatRoadhog(int health);
-int rangedCombatRoadhog(int health);
 
 int main() {
 
     //variables that control the games loop and timekeeping
-    const float delta_time = 0.1f;
-    float clock = 0.0f;
+    const int delta_time = 1;
+    int clock = 0;
     bool gameLoop = true;
     bool getOverHere = false;
     int loopCount = 0;
 
     //Mcree stats
     int mcreeHealth = 200;
-    const int mcreeMagazine = 4;
-    const float mcreereloadSpeed = 1.5f;
+    int mcreeMagazine = 6;
+    bool reloadingMcree = false;
+    int reloadingTimeMcree = 0;
+
 
     //Roadhog stats
     int roadhogHealth = 600;
-    const int roadhogMagazine = 4;
-    const float roadhogreloadSpeed = 1.5f;
+    int roadhogMagazine = 4;
+    bool reloadingRoadhog = false;
+    int reloadingTimeRoadhog = 0;
 
     while (gameLoop) {
         clock += delta_time;
-        std::chrono::milliseconds timespan(500); //Includerade detta + <chrono> + <thread> för att det skulle bli fancy och spela ut i realtid. Alla räkningar och liknande funkar fortfarande bara via simulering av tid.
+        loopCount += 1;
+        std::chrono::milliseconds timespan(1000); //Includerade detta + <chrono> + <thread> för att det skulle bli fancy och spela ut i realtid. Alla räkningar och liknande funkar fortfarande bara via simulering av tid.
         std::this_thread::sleep_for(timespan);
-        std::cout << "Mcrees health is at: " << mcreeHealth << std::endl;
-        std::cout << "Roadhogs health is at: " << roadhogHealth << std::endl;
-        std::cout << clock << " seconds have elappsed.\n";
 
-       // if(clock == (loopCount += 0.5f)) {//TODO, kolla upp hur man kan jämföra numret för att kolla om det är jämnt eller ojämnt. Väldigt konstigt iochmed att det är en float. Just nu körs den här endast 1 gång. Funderade på att resetta loopcount och ha den som jämförelse för clock men det skulle inte fungera.
-            if (getOverHere == true) { //TODO fixa en räknare med delta_time och clock som medf hjälp av if-satser kollar när de får skjuta och inte. Kollar även magasin och reloading här
-                //TODO, sätt upp separata if-satser för Mcree och Roadhog så att de kan attackera oberoende av varandra. TODO sätt upp så att Roadhog kan hooka direkt och skriv ut det i konsollen. TODO, sätt in wait-funktioner så att det spelar ut i realtid.
-                //TODO, bryt ut allt detta i en egen fil eller funktion så att väldigt lite ligger i int Main.
-                //TODO, överkurs men sätt upp construktor så att det skulle vara lätt att göra nya karaktärer med sina egna stats och eventuellt abilities.
-                //TODO, gör som Numberphile sa, istället för float för floatpoint comparison så kör man int och bara multiplicerar eller dividerar för att få det att bli som en float. Då vet jag att % 2 == 0 kommer att fungera. Om varje loop blir 1 sekund och då skjuter Mcree varje loop och Roadhog skjuter varannan loop. Det skulle funka men vet inte om det skulle vara det bösta,
-                int tempDmgRoadhog = roadhogHealth;
-                roadhogHealth = closeCombatMcree(roadhogHealth);
-                std::cout << "Mcree did: " << tempDmgRoadhog - roadhogHealth << " damage to Roadhog!\n";
-
-                int tempDmgMcree = mcreeHealth;
-                mcreeHealth = closeCombatRoadhog(mcreeHealth);
-                std::cout << "Roadhog did: " << tempDmgMcree - mcreeHealth << " damage to Mcree!\n";
+        if (reloadingMcree != true) { //Mcree rootin tootin cowboy shootin, Mcree shoots every available round
+            if(mcreeMagazine > 0) {
+                mcreeMagazine -= 1;
+                roadhogHealth = combatMcree(roadhogHealth, getOverHere);
+                std::cout << "Mcree's got: " << mcreeMagazine << " bullets left! \n";
             }
-            else if (getOverHere == false) {
-                int tempDmgRoadhog = roadhogHealth;
-                roadhogHealth = rangedCombatMcree(roadhogHealth);
-                std::cout << "Mcree did: " << tempDmgRoadhog - roadhogHealth << " damage to Roadhog!\n";
-
-                int tempDmgMcree = mcreeHealth;
-                mcreeHealth = rangedCombatRoadhog(mcreeHealth);
-                std::cout << "Roadhog did: " << tempDmgMcree - mcreeHealth << " damage to Mcree!\n";
+            else {
+                reloadingMcree = true;
+                reloadingTimeMcree = 15;
+                std::cout << "Mcree is reloading, he won't be able to shoot for another " << reloadingTimeMcree << " seconds!\n";
             }
-        //}
-        if (roadhogHealth <= 0 || mcreeHealth <= 0) {//Checks if any participant has lost all their health and subsequently lost the duel.
-            if (roadhogHealth <= 0) {
-                std::cout << "Mcree wins!\n" << "Mcree had:" << mcreeHealth << " health left!\n";
-                gameLoop = false;
-            }
-            else if (mcreeHealth <= 0) {
-                std::cout << "Roadhog wins!\n" << "Roadhog had:" << roadhogHealth << " health left!\n";
-                gameLoop = false;
-            }
-            return 0;
         }
-        std::cout<<std::endl;
-        loopCount += 0.1;
+        if (clock % 2 != 0 && reloadingRoadhog != true) { //RoadHog is blasting away here, RoadHog only shoots every other round
+            if (roadhogMagazine > 0) {
+                roadhogMagazine -= 1;
+                mcreeHealth = combatRoadHog(mcreeHealth, getOverHere);
+                std::cout << "Roadhog's got: " << roadhogMagazine << " bullets left! \n";
+            }
+            else {
+                reloadingRoadhog = true;
+                reloadingTimeRoadhog = 15;
+                std::cout << "Roadhog is reloading, he won't be able to shoot for another " << reloadingTimeRoadhog << " seconds!\n";
+            }
+        }
+        if (reloadingTimeMcree > 0) {//Reloading code for cowboy
+            reloadingTimeMcree -= 1;
+            if (reloadingTimeMcree <= 0) {
+                mcreeMagazine = 6;
+                reloadingMcree = false;
+            }
+        }
+        if(reloadingTimeRoadhog > 0) {//Reloading code for Roadie
+            reloadingTimeRoadhog -= 1;
+            if(reloadingTimeRoadhog <= 0) {
+                roadhogMagazine = 4;
+                reloadingRoadhog = false;
+            }
+        }
+        gameOver(roadhogHealth, mcreeHealth, gameLoop);
+        std::cout << std::endl;
     }
 }
-int closeCombatMcree(int health){//Separate functions for each character for if they're close to eacher or not. Deals the damage to the enemies health then returns that value to the Main function
-    const int mcreeCloseDmg = 70;
-    health -= mcreeCloseDmg;
-    return health;
+
+int combatMcree(int roadhogHealth, bool hooked) { //Mcree's rootin tootin cowboy shootin function, handles both close and far ranged combat. Returns the opponents health
+    const int damageClose = 70;
+    const int damageRanged = 35;
+    if (hooked == true) {
+        roadhogHealth -= damageClose;
+        std::cout << "Mcree did: " << damageClose << " damage to RoadHog!\n" << "RoadHog now has: " << roadhogHealth << " left!\n";
+        return roadhogHealth;
+    }
+    else {
+        roadhogHealth -= damageRanged;
+        std::cout << "Mcree did: " << damageRanged << " damage to RoadHog!\n" << "RoadHog now has: " << roadhogHealth << " left!\n";
+        return roadhogHealth;
+    }
 }
 
-int rangedCombatMcree(int health){
-    const int mcreeRangedDmg = 35;
-    health -= mcreeRangedDmg;
-    return health;
+int combatRoadHog(int mcreeHealth, bool hooked) { // Roadie is mad and also wants to shoot the cowboy with a particular name. Shame blizzard did what they did
+    const int damageClose = 255;
+    const int damageRanged = 20;
+    if (hooked == true) {
+        mcreeHealth -= damageClose;
+        std::cout << "Roadhog did: " << damageClose << " damage to Mcree!\n" << "Mcree now has: " << mcreeHealth << " left!\n";
+        return mcreeHealth;
+    }
+    else{
+        mcreeHealth -= damageRanged;
+        std::cout << "Roadhog did: " << damageRanged << " damage to Mcree!\n" << "Mcree now has: " << mcreeHealth << " left!\n";
+        return mcreeHealth;
+    }
 }
 
-int closeCombatRoadhog(int health) {
-    const int roadhogCloseDmg = 255;
-    health -= roadhogCloseDmg;
-    return health;
-}
-
-int rangedCombatRoadhog(int health) {
-    const int roadhogRangedDmg = 20;
-    health -= roadhogRangedDmg;
-    return health;
+int gameOver(int roadhogHealth, int mcreeHealth, bool gameLoop) {
+    if (roadhogHealth <= 0 || mcreeHealth <= 0) {//Checks if any participant has lost all their health and subsequently lost the duel.
+        if (roadhogHealth <= 0) {
+            std::cout << "Mcree wins!\n" << "Mcree had: " << mcreeHealth << " health left!\n";
+            gameLoop = false;
+        }
+        else if (mcreeHealth <= 0) {
+            std::cout << "Roadhog wins!\n" << "Roadhog had: " << roadhogHealth << " health left!\n";
+            gameLoop = false;
+        }
+        exit(0);
+    }
 }
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
 // Debug program: F5 or Debug > Start Debugging menu
