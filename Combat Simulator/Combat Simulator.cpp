@@ -1,12 +1,14 @@
 #include <iostream>
+#include <chrono>
+#include <thread>
 //functions for Mcree's damage and shooting rate at various distances
-int closeCombatMcree(float health);
-int rangedCombatMcree(float health);
+int closeCombatMcree(int health);
+int rangedCombatMcree(int health);
 
 
 //functions for Roadhogs's damage and shooting rate at various dintances
-int closeCombatRoadhog(float health);
-int rangedCombatRoadhog(float health);
+int closeCombatRoadhog(int health);
+int rangedCombatRoadhog(int health);
 
 int main() {
 
@@ -18,45 +20,47 @@ int main() {
     int loopCount = 0;
 
     //Mcree stats
-    float mcreeHealth = 200.0f;
+    int mcreeHealth = 200;
     const int mcreeMagazine = 4;
     const float mcreereloadSpeed = 1.5f;
 
     //Roadhog stats
-    float roadhogHealth = 600.0f;
+    int roadhogHealth = 600;
     const int roadhogMagazine = 4;
     const float roadhogreloadSpeed = 1.5f;
 
     while (gameLoop) {
         clock += delta_time;
-        loopCount += 1;
+        std::chrono::milliseconds timespan(500); //Includerade detta + <chrono> + <thread> för att det skulle bli fancy och spela ut i realtid. Alla räkningar och liknande funkar fortfarande bara via simulering av tid.
+        std::this_thread::sleep_for(timespan);
         std::cout << "Mcrees health is at: " << mcreeHealth << std::endl;
         std::cout << "Roadhogs health is at: " << roadhogHealth << std::endl;
         std::cout << clock << " seconds have elappsed.\n";
-        if(clock == 0.5f) {//TODO, kolla upp hur man kan jämföra numret för att kolla om det är jämnt eller ojämnt. Väldigt konstigt iochmed att det är en float. Just nu körs den här endast 1 gång. Funderade på att resetta loopcount och ha den som jämförelse för clock men det skulle inte fungera.
+
+       // if(clock == (loopCount += 0.5f)) {//TODO, kolla upp hur man kan jämföra numret för att kolla om det är jämnt eller ojämnt. Väldigt konstigt iochmed att det är en float. Just nu körs den här endast 1 gång. Funderade på att resetta loopcount och ha den som jämförelse för clock men det skulle inte fungera.
             if (getOverHere == true) { //TODO fixa en räknare med delta_time och clock som medf hjälp av if-satser kollar när de får skjuta och inte. Kollar även magasin och reloading här
                 //TODO, sätt upp separata if-satser för Mcree och Roadhog så att de kan attackera oberoende av varandra. TODO sätt upp så att Roadhog kan hooka direkt och skriv ut det i konsollen. TODO, sätt in wait-funktioner så att det spelar ut i realtid.
                 //TODO, bryt ut allt detta i en egen fil eller funktion så att väldigt lite ligger i int Main.
                 //TODO, överkurs men sätt upp construktor så att det skulle vara lätt att göra nya karaktärer med sina egna stats och eventuellt abilities.
                 //TODO, gör som Numberphile sa, istället för float för floatpoint comparison så kör man int och bara multiplicerar eller dividerar för att få det att bli som en float. Då vet jag att % 2 == 0 kommer att fungera. Om varje loop blir 1 sekund och då skjuter Mcree varje loop och Roadhog skjuter varannan loop. Det skulle funka men vet inte om det skulle vara det bösta,
-                float tempDmgRoadhog = roadhogHealth;
+                int tempDmgRoadhog = roadhogHealth;
                 roadhogHealth = closeCombatMcree(roadhogHealth);
                 std::cout << "Mcree did: " << tempDmgRoadhog - roadhogHealth << " damage to Roadhog!\n";
 
-                float tempDmgMcree = mcreeHealth;
+                int tempDmgMcree = mcreeHealth;
                 mcreeHealth = closeCombatRoadhog(mcreeHealth);
                 std::cout << "Roadhog did: " << tempDmgMcree - mcreeHealth << " damage to Mcree!\n";
             }
             else if (getOverHere == false) {
-                float tempDmgRoadhog = roadhogHealth;
+                int tempDmgRoadhog = roadhogHealth;
                 roadhogHealth = rangedCombatMcree(roadhogHealth);
                 std::cout << "Mcree did: " << tempDmgRoadhog - roadhogHealth << " damage to Roadhog!\n";
 
-                float tempDmgMcree = mcreeHealth;
+                int tempDmgMcree = mcreeHealth;
                 mcreeHealth = rangedCombatRoadhog(mcreeHealth);
                 std::cout << "Roadhog did: " << tempDmgMcree - mcreeHealth << " damage to Mcree!\n";
             }
-        }
+        //}
         if (roadhogHealth <= 0 || mcreeHealth <= 0) {//Checks if any participant has lost all their health and subsequently lost the duel.
             if (roadhogHealth <= 0) {
                 std::cout << "Mcree wins!\n" << "Mcree had:" << mcreeHealth << " health left!\n";
@@ -69,28 +73,29 @@ int main() {
             return 0;
         }
         std::cout<<std::endl;
+        loopCount += 0.1;
     }
 }
-int closeCombatMcree(float health){//Separate functions for each character for if they're close to eacher or not. Deals the damage to the enemies health then returns that value to the Main function
-    const float mcreeCloseDmg = 70.0f;
+int closeCombatMcree(int health){//Separate functions for each character for if they're close to eacher or not. Deals the damage to the enemies health then returns that value to the Main function
+    const int mcreeCloseDmg = 70;
     health -= mcreeCloseDmg;
     return health;
 }
 
-int rangedCombatMcree(float health){
-    const float mcreeRangedDmg = 35.0f;
+int rangedCombatMcree(int health){
+    const int mcreeRangedDmg = 35;
     health -= mcreeRangedDmg;
     return health;
 }
 
-int closeCombatRoadhog(float health) {
-    const float roadhogCloseDmg = 255.0f;
+int closeCombatRoadhog(int health) {
+    const int roadhogCloseDmg = 255;
     health -= roadhogCloseDmg;
     return health;
 }
 
-int rangedCombatRoadhog(float health) {
-    const float roadhogRangedDmg = 20.0f;
+int rangedCombatRoadhog(int health) {
+    const int roadhogRangedDmg = 20;
     health -= roadhogRangedDmg;
     return health;
 }
